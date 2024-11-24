@@ -11,6 +11,7 @@ const FormField = ({
   otherStyles,
   ...props
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
   const [inputBorderColor, setInputBorderColor] = useState("border-black-200");
 
   const customOnFocus = () => {
@@ -29,19 +30,19 @@ const FormField = ({
 
   return (
     <View className={`space-y-2 ${otherStyles}`}>
-      <Text className="text-lg text-gray-100 font-pmedium">{title}</Text>
+      <Text className="text-base text-gray-100 font-pmedium">{title}</Text>
 
       <View
         className={`border-2 w-full h-16 bg-black-100 px-4 rounded-2xl items-center flex-row ${inputBorderColor}`}
         style={props.style}
       >
         <TextInput
-          className="text-lg flex-1 text-white font-psemibold"
+          className="text-base flex-1 text-white font-psemibold"
           value={value}
           placeholder={placeholder}
           placeholderTextColor="#7b7b8b"
           onChangeText={handleChangeText}
-          secureTextEntry={title === "Password"}
+          secureTextEntry={title === "Password" && !showPassword}
           onFocus={customOnFocus}
           onBlur={customOnBlur}
           {...props}

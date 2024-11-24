@@ -59,14 +59,14 @@ const SignUp = () => {
             title="Username"
             value={form.username}
             handleChangeText={(e) => setForm({ ...form, username: e })}
-            otherStyles="mt-10 gap-2"
+            otherStyles="mt-10"
           />
 
           <FormField 
             title="Email"
             value={form.email}
             handleChangeText={(e) => setForm({ ...form, email: e })}
-            otherStyles="mt-7 gap-2"
+            otherStyles="mt-7"
             keyboardType="email-address"
           />
 
@@ -74,7 +74,7 @@ const SignUp = () => {
             title="Password"
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
-            otherStyles="mt-7 gap-2"
+            otherStyles="mt-7"
           />
 
           <CustomButton 
@@ -85,10 +85,10 @@ const SignUp = () => {
           />
 
           <View className="justify-center pt-5 flex-row gap-2">
-            <Text className="text-xl text-gray-100 font-pregular">
+            <Text className="text-lg text-gray-100 font-pregular">
               Have an account already?
             </Text>
-            <Link href="/sign-in" className="text-xl font-psemibold text-secondary">Sign In</Link>
+            <Link href="/sign-in" className="text-lg font-psemibold text-secondary">Sign In</Link>
           </View>
 
         </View>

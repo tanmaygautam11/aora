@@ -11,6 +11,7 @@ const SearchInput = ({
   otherStyles,
   ...props
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
   const [inputBorderColor, setInputBorderColor] = useState("border-black-200");
 
   const customOnFocus = () => {
@@ -28,17 +29,14 @@ const SearchInput = ({
   };
 
   return (
-    <View className={`space-y-2 ${otherStyles}`}>
-      <Text className="text-lg text-gray-100 font-pmedium">{title}</Text>
-
       <View
-        className={`border-2 w-full h-16 bg-black-100 px-4 rounded-2xl items-center flex-row ${inputBorderColor}`}
+        className={`border-2 w-full h-16 bg-black-100 px-4 rounded-2xl items-center flex-row space-x-4 ${inputBorderColor}`}
         style={props.style}
       >
         <TextInput
-          className="text-lg flex-1 text-white font-psemibold"
+          className="text-base mt-0.5 flex-1 text-white font-pregular"
           value={value}
-          placeholder={placeholder}
+          placeholder="Search for a video topic"
           placeholderTextColor="#7b7b8b"
           onChangeText={handleChangeText}
           secureTextEntry={title === "Password"}
@@ -47,17 +45,14 @@ const SearchInput = ({
           {...props}
         />
 
-        {title === "Password" && (
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Image
-              source={!showPassword ? icons.eye : icons.eyeHide}
-              className="w-6 h-6"
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity>
+          <Image
+            source={icons.search}
+            className="w-5 h-5"
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
-    </View>
   );
 };
 
