@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResizeMode, Video } from "expo-av";
 import * as Animatable from "react-native-animatable";
+import * as ScreenOrientation from "expo-screen-orientation";
 import {
   FlatList,
   Image,
   ImageBackground,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 import { icons } from "../constants";
@@ -30,6 +32,14 @@ const zoomOut = {
 
 const TrendingItem = ({ activeItem, item }) => {
   const [play, setPlay] = useState(false);
+  const [resizeMode, setResizeMode] = useState(ResizeMode.COVER);
+
+  useEffect(() => {
+    const unlockOrientation = async () => {
+      await ScreenOrientation.unlockAsync();
+    };
+    unlockOrientation();
+  }, []);
 
   return (
     <Animatable.View
@@ -38,24 +48,27 @@ const TrendingItem = ({ activeItem, item }) => {
       duration={500}
     >
       {play ? (
-        <Video
-          source={{ uri: item.video }}
-          style={{
-            width: 208,
-            height: 288,
-            borderRadius: 35,
-            marginTop: 12,
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-          }}
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          shouldPlay
-          onPlaybackStatusUpdate={(status) => {
-            if (status.didJustFinish) {
-              setPlay(false);
-            }
-          }}
-        />
+        <View className="w-52 h-72 rounded-[35px] mt-3 bg-white/10">
+          <Video
+            style={{ width: "100%", height: "100%", borderRadius: 33 }}
+            source={{ uri: item.video }}
+            resizeMode={resizeMode}
+            useNativeControls
+            shouldPlay
+            onFullscreenUpdate={({ fullscreenUpdate }) => {
+              if (fullscreenUpdate === 1) {
+                setResizeMode(ResizeMode.CONTAIN); // Fullscreen: Contain
+              } else if (fullscreenUpdate === 3) {
+                setResizeMode(ResizeMode.COVER); // Exit fullscreen: Cover
+              }
+            }}
+            onPlaybackStatusUpdate={(status) => {
+              if (status.didJustFinish) {
+                setPlay(false);
+              }
+            }}
+          />
+        </View>
       ) : (
         <TouchableOpacity
           className="relative flex justify-center items-center"

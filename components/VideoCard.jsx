@@ -1,10 +1,19 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { icons } from '../constants'
+import { View, Text, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { icons } from '../constants';
 import { ResizeMode, Video } from "expo-av";
+import * as ScreenOrientation from 'expo-screen-orientation';
 
-const Videocard = ({ video: { title, thumbnail, video, users: {username, avatar} } }) => {
+const Videocard = ({ video: { title, thumbnail, video, users: { username, avatar } } }) => {
   const [play, setPlay] = useState(false);
+  const [resizeMode, setResizeMode] = useState(ResizeMode.COVER);
+
+  useEffect(() => {
+    const unlockOrientation = async () => {
+      await ScreenOrientation.unlockAsync();
+    };
+    unlockOrientation();
+  }, []);
 
   return (
     <View className="flex-col items-center px-4 mb-14">
@@ -29,29 +38,32 @@ const Videocard = ({ video: { title, thumbnail, video, users: {username, avatar}
         </View>
 
         <View className="pt-2">
-          <Image source={icons.menu} className="w-5 h-5" resizeMode='contain' />
+          <Image source={icons.menu} className="w-5 h-5" resizeMode="contain" />
         </View>
       </View>
 
       {play ? (
-        <Video
-          source={{ uri: video }}
-          style={{
-            width: "100%",
-            height: 210,
-            borderRadius: 10,
-            marginTop: 8,
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-          }}
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          shouldPlay
-          onPlaybackStatusUpdate={(status) => {
-            if (status.didJustFinish) {
-              setPlay(false);
-            }
-          }}
-        />
+        <View className="w-full h-60 rounded-xl mt-3">
+          <Video
+            style={{ width: "100%", height: "100%", borderRadius: 12 }}
+            source={{ uri: video }}
+            resizeMode={resizeMode}
+            useNativeControls
+            shouldPlay
+            onFullscreenUpdate={({ fullscreenUpdate }) => {
+              if (fullscreenUpdate === 1) { // Entering fullscreen
+                setResizeMode(ResizeMode.CONTAIN);
+              } else if (fullscreenUpdate === 3) { // Exiting fullscreen
+                setResizeMode(ResizeMode.COVER);
+              }
+            }}
+            onPlaybackStatusUpdate={(status) => {
+              if (status.didJustFinish) {
+                setPlay(false);
+              }
+            }}
+          />
+        </View>
       ) : (
         <TouchableOpacity
           activeOpacity={0.7}
@@ -71,7 +83,7 @@ const Videocard = ({ video: { title, thumbnail, video, users: {username, avatar}
         </TouchableOpacity>
       )}
     </View>
-  )
-}
+  );
+};
 
-export default Videocard
+export default Videocard;
