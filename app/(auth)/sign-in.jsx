@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Image, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Link } from 'expo-router'
+import { Link, router } from 'expo-router'
 
 import { images } from '../../constants';
 
@@ -14,7 +14,6 @@ import { useGlobalContext } from '../../context/GlobalProvider';
 
 const SignIn = () => {
   const { setUser, setIsLoggedIn } = useGlobalContext();
-  const router = useRouter();
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,13 +27,6 @@ const SignIn = () => {
     setIsSubmitting(true);
 
     try {
-      const existingUser = await getCurrentUser();
-      if (existingUser) {
-        setUser(existingUser);
-        setIsLoggedIn(true);
-        router.replace("/home");
-        return;
-      }
       await signIn(form.email, form.password);
 
       const result = await getCurrentUser();

@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Image, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter, Link } from 'expo-router'
+import { router, Link } from 'expo-router'
 
 import { images } from '../../constants';
 
@@ -14,7 +14,6 @@ import { useGlobalContext } from '../../context/GlobalProvider';
 const SignUp = () => {
   const { setUser, setIsLoggedIn } = useGlobalContext()
 
-  const router = useRouter();
   const [form, setForm] = useState({
     username: '',
     email: '',

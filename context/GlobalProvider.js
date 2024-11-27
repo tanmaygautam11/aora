@@ -23,12 +23,13 @@ const GlobalProvider = ({ children }) => {
             })
             .catch(error => {
                 console.log(error);
+                setIsLoggedIn(false);
+                setUser(null);
             })
             .finally(() => {
                 setIsLoading(false);
             })
-    }, []);
-
+        }, []);
     return (
         <GlobalContext.Provider 
             value={{

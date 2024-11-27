@@ -4,7 +4,7 @@ import { icons } from '../constants';
 import { ResizeMode, Video } from "expo-av";
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-const Videocard = ({ video: { title, thumbnail, video, users: { username, avatar } } }) => {
+const Videocard = ({ video: { title, thumbnail, video, creator: { username, avatar } } }) => {
   const [play, setPlay] = useState(false);
   const [resizeMode, setResizeMode] = useState(ResizeMode.COVER);
 
