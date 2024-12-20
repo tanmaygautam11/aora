@@ -3,17 +3,16 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "../../constants";
-
-import SearchInput from "../../components/SearchInput";
-import Trending from "../../components/Trending";
-import EmptyState from "../../components/EmptyState";
-import { getAllPosts, getLatestPosts } from "../../lib/appwrite";
+import { getAllPosts, getLatestPosts, toggleBookmark } from "../../lib/appwrite";
 import useAppwrite from "../../lib/useAppwrite";
 import VideoCard from "../../components/VideoCard";
+import SearchInput from "../../components/SearchInput";
+import EmptyState from "../../components/EmptyState";
+import Trending from "../../components/Trending";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
 const Home = () => {
-  const { user } = useGlobalContext();
+  const { user, bookmarkedPosts, toggleBookmarkInGlobalState } = useGlobalContext();
   const { data: posts, refetch } = useAppwrite(getAllPosts);
   const { data: latestPosts } = useAppwrite(getLatestPosts);
 
@@ -25,12 +24,28 @@ const Home = () => {
     setRefreshing(false);
   };
 
+  const handleBookmarkToggle = async (postId) => {
+    try {
+      const updatedPost = await toggleBookmark(postId, user?.$id);
+      const isBookmarked = updatedPost.bookmark !== null;
+      toggleBookmarkInGlobalState(postId, isBookmarked); // Update the global bookmark state
+    } catch (error) {
+      console.error("Failed to toggle bookmark:", error.message);
+    }
+  };
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
         data={posts}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => <VideoCard video={item} />}
+        renderItem={({ item }) => (
+          <VideoCard
+            video={item}
+            bookmarked={bookmarkedPosts[item.$id] ?? false} // Get bookmark status from global state
+            onBookmarkToggle={handleBookmarkToggle} // Use global toggle function
+          />
+        )}
         ListHeaderComponent={() => (
           <View className="my-6 px-4 space-y-6">
             <View className="justify-between items-start flex-row mb-6">

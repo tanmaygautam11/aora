@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
 import { getCurrentUser } from "../lib/appwrite";
 
 const GlobalContext = createContext();
@@ -9,6 +8,9 @@ const GlobalProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    
+    // New state for tracking bookmarked posts
+    const [bookmarkedPosts, setBookmarkedPosts] = useState({});
 
     useEffect(() => {
         getCurrentUser()
@@ -28,8 +30,17 @@ const GlobalProvider = ({ children }) => {
             })
             .finally(() => {
                 setIsLoading(false);
-            })
-        }, []);
+            });
+    }, []);
+
+    // Function to toggle bookmark status in global state
+    const toggleBookmarkInGlobalState = (postId, isBookmarked) => {
+        setBookmarkedPosts((prev) => ({
+            ...prev,
+            [postId]: isBookmarked
+        }));
+    };
+
     return (
         <GlobalContext.Provider 
             value={{
@@ -37,12 +48,14 @@ const GlobalProvider = ({ children }) => {
                 setIsLoggedIn,
                 user,
                 setUser,
-                isLoading
+                isLoading,
+                bookmarkedPosts, // Expose the bookmarkedPosts state
+                toggleBookmarkInGlobalState // Function to toggle bookmarks
             }}
         >
             {children}
         </GlobalContext.Provider>
-    )
+    );
 }
 
 export default GlobalProvider;

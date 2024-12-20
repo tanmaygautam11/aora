@@ -1,17 +1,22 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { icons } from '../constants';
+import { View, Text, Image, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { icons } from "../constants";
 import { ResizeMode, Video } from "expo-av";
-import * as ScreenOrientation from 'expo-screen-orientation';
+import * as ScreenOrientation from "expo-screen-orientation";
 
-const Videocard = ({ video: { title, thumbnail, video, creator: { username, avatar } } }) => {
+const VideoCard = ({
+  video: { title, thumbnail, video, creator: { username, avatar }, $id },
+  bookmarked,
+  onBookmarkToggle,
+}) => {
   const [play, setPlay] = useState(false);
   const [resizeMode, setResizeMode] = useState(ResizeMode.COVER);
 
+  const unlockOrientation = async () => {
+    await ScreenOrientation.unlockAsync();
+  };
+
   useEffect(() => {
-    const unlockOrientation = async () => {
-      await ScreenOrientation.unlockAsync();
-    };
     unlockOrientation();
   }, []);
 
@@ -37,6 +42,14 @@ const Videocard = ({ video: { title, thumbnail, video, creator: { username, avat
           </View>
         </View>
 
+        <TouchableOpacity onPress={() => onBookmarkToggle($id)} className="pt-2">
+          <Image
+            source={bookmarked ? icons.bookmarked : icons.bookmark}
+            className="w-5 h-5"
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
         <View className="pt-2">
           <Image source={icons.menu} className="w-5 h-5" resizeMode="contain" />
         </View>
@@ -51,9 +64,9 @@ const Videocard = ({ video: { title, thumbnail, video, creator: { username, avat
             useNativeControls
             shouldPlay
             onFullscreenUpdate={({ fullscreenUpdate }) => {
-              if (fullscreenUpdate === 1) { // Entering fullscreen
+              if (fullscreenUpdate === 1) {
                 setResizeMode(ResizeMode.CONTAIN);
-              } else if (fullscreenUpdate === 3) { // Exiting fullscreen
+              } else if (fullscreenUpdate === 3) {
                 setResizeMode(ResizeMode.COVER);
               }
             }}
@@ -68,14 +81,14 @@ const Videocard = ({ video: { title, thumbnail, video, creator: { username, avat
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => setPlay(true)}
-          className="w-full h-60 rounded-xl mt-3 relative justify-center items-center">
+          className="w-full h-60 rounded-xl mt-3 relative justify-center items-center"
+        >
           <Image
             source={{ uri: thumbnail }}
             className="w-full h-full rounded-xl mt-3"
             resizeMode="cover"
           />
-
-          <Image 
+          <Image
             source={icons.play}
             className="w-12 h-12 absolute"
             resizeMode="contain"
@@ -86,4 +99,4 @@ const Videocard = ({ video: { title, thumbnail, video, creator: { username, avat
   );
 };
 
-export default Videocard;
+export default VideoCard;

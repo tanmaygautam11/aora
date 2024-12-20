@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import useAppwrite from "../../lib/useAppwrite";
 import { getUserPosts, signOut } from "../../lib/appwrite";
-import SearchInput from "../../components/SearchInput";
 import EmptyState from "../../components/EmptyState";
 import VideoCard from "../../components/VideoCard";
 
@@ -12,9 +11,10 @@ import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons } from "../../constants";
 import InfoBox from "../../components/InfoBox";
 import { router } from "expo-router";
+import { toggleBookmark } from "../../lib/appwrite";
 
 const Profile = () => {
-  const { user, setUser, setIsLoggedIn } = useGlobalContext();
+  const { user, setUser, setIsLoggedIn, bookmarkedPosts, toggleBookmarkInGlobalState } = useGlobalContext();
   const { data: posts } = useAppwrite(() => getUserPosts(user.$id));
 
   const logout = async () => {
@@ -23,14 +23,30 @@ const Profile = () => {
     setIsLoggedIn(false);
 
     router.replace('/sign-in')
-  }
+  };
+
+  const handleBookmarkToggle = async (postId) => {
+    try {
+      const updatedPost = await toggleBookmark(postId, user?.$id);
+      const isBookmarked = updatedPost.bookmark !== null;
+      toggleBookmarkInGlobalState(postId, isBookmarked); // Update global bookmark state
+    } catch (error) {
+      console.error("Failed to toggle bookmark:", error.message);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList
         data={posts}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => <VideoCard video={item} />}
+        renderItem={({ item }) => (
+          <VideoCard
+            video={item}
+            bookmarked={bookmarkedPosts[item.$id] ?? false} // Get bookmark status from global state
+            onBookmarkToggle={handleBookmarkToggle} // Use the global toggle function
+          />
+        )}
         ListHeaderComponent={() => (
           <View className="w-full justify-center items-center mt-6 mb-12 px-4">
             <TouchableOpacity className="w-full items-end mb-10" onPress={logout}>
