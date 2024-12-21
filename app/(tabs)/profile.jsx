@@ -1,12 +1,10 @@
 import { useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, Image } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Image, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import useAppwrite from "../../lib/useAppwrite";
-import { getUserPosts, signOut } from "../../lib/appwrite";
+import { getUserPosts, signOut, deleteVideo } from "../../lib/appwrite"; // Import deleteVideo function
 import EmptyState from "../../components/EmptyState";
 import VideoCard from "../../components/VideoCard";
-
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons } from "../../constants";
 import InfoBox from "../../components/InfoBox";
@@ -21,17 +19,30 @@ const Profile = () => {
     await signOut();
     setUser(null);
     setIsLoggedIn(false);
-
-    router.replace('/sign-in')
+    router.replace('/sign-in');
   };
 
   const handleBookmarkToggle = async (postId) => {
     try {
       const updatedPost = await toggleBookmark(postId, user?.$id);
       const isBookmarked = updatedPost.bookmark !== null;
-      toggleBookmarkInGlobalState(postId, isBookmarked); // Update global bookmark state
+      toggleBookmarkInGlobalState(postId, isBookmarked);
     } catch (error) {
       console.error("Failed to toggle bookmark:", error.message);
+    }
+  };
+
+  // Handle video deletion
+  const handleDelete = async (videoId) => {
+    try {
+      const response = await deleteVideo(videoId);
+      if (response.success) {
+        Alert.alert('Success', 'Video deleted successfully!');
+      } else {
+        Alert.alert('Error', response.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete the video.');
     }
   };
 
@@ -43,8 +54,10 @@ const Profile = () => {
         renderItem={({ item }) => (
           <VideoCard
             video={item}
-            bookmarked={bookmarkedPosts[item.$id] ?? false} // Get bookmark status from global state
-            onBookmarkToggle={handleBookmarkToggle} // Use the global toggle function
+            bookmarked={bookmarkedPosts[item.$id] ?? false}
+            onBookmarkToggle={handleBookmarkToggle}
+            showDeleteIcon={true} // Ensure delete icon is shown in the profile page
+            onDelete={() => handleDelete(item.$id)}  // Pass delete function to VideoCard
           />
         )}
         ListHeaderComponent={() => (

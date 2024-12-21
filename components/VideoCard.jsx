@@ -8,6 +8,8 @@ const VideoCard = ({
   video: { title, thumbnail, video, creator: { username, avatar }, $id },
   bookmarked,
   onBookmarkToggle,
+  showDeleteIcon,
+  onDelete
 }) => {
   const [play, setPlay] = useState(false);
   const [resizeMode, setResizeMode] = useState(ResizeMode.COVER);
@@ -50,9 +52,11 @@ const VideoCard = ({
           />
         </TouchableOpacity>
 
-        <View className="pt-2">
-          <Image source={icons.menu} className="w-5 h-5" resizeMode="contain" />
-        </View>
+        {showDeleteIcon && (
+          <TouchableOpacity onPress={() => onDelete(video.$id)} className=" top-2">
+            <Image source={icons.del} className="w-5 h-5" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {play ? (
