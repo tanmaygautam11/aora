@@ -19,7 +19,6 @@ const Bookmark = () => {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  // Show the alert every time the page is focused
   useFocusEffect(
     React.useCallback(() => {
       setRefreshing(true);
