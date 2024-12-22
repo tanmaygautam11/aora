@@ -10,10 +10,11 @@ import { icons } from "../../constants";
 import InfoBox from "../../components/InfoBox";
 import { router } from "expo-router";
 import { toggleBookmark } from "../../lib/appwrite";
+import Loader from "../../components/Loader";
 
 const Profile = () => {
   const { user, setUser, setIsLoggedIn, bookmarkedPosts, toggleBookmarkInGlobalState } = useGlobalContext();
-  const { data: posts } = useAppwrite(() => getUserPosts(user.$id));
+  const { data: posts, loading } = useAppwrite(() => getUserPosts(user.$id));
 
   const logout = async () => {
     await signOut();
@@ -46,6 +47,13 @@ const Profile = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView className="bg-primary h-full justify-center items-center">
+        <Loader />
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView className="bg-primary h-full">
       <FlatList

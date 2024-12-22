@@ -1,8 +1,9 @@
 import { View, Text, FlatList, Image, RefreshControl, Alert } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 
+import Loader from "../../components/Loader";
 import { images } from "../../constants";
 import useAppwrite from "../../lib/useAppwrite";
 import SearchInput from "../../components/SearchInput";
@@ -12,7 +13,7 @@ import { useGlobalContext } from "../../context/GlobalProvider";
 import { getUserBookmarkedPosts, toggleBookmark } from "../../lib/appwrite";
 
 const Bookmark = () => {
-  const { user, bookmarkedPosts, toggleBookmarkInGlobalState } = useGlobalContext();
+  const { user, toggleBookmarkInGlobalState } = useGlobalContext();
   const { data: posts, loading, refetch } = useAppwrite(() =>
     getUserBookmarkedPosts(user?.$id)
   );
@@ -47,7 +48,7 @@ const Bookmark = () => {
   if (loading) {
     return (
       <SafeAreaView className="bg-primary h-full justify-center items-center">
-        <Text className="text-white font-pmedium text-base">Loading...</Text>
+        <Loader />
       </SafeAreaView>
     );
   }

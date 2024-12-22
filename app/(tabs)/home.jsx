@@ -10,10 +10,11 @@ import SearchInput from "../../components/SearchInput";
 import EmptyState from "../../components/EmptyState";
 import Trending from "../../components/Trending";
 import { useGlobalContext } from "../../context/GlobalProvider";
+import Loader from "../../components/Loader";
 
 const Home = () => {
   const { user, bookmarkedPosts, toggleBookmarkInGlobalState } = useGlobalContext();
-  const { data: posts, refetch } = useAppwrite(getAllPosts);
+  const { data: posts, loading, refetch } = useAppwrite(getAllPosts);
   const { data: latestPosts } = useAppwrite(getLatestPosts);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -23,6 +24,14 @@ const Home = () => {
     await refetch();
     setRefreshing(false);
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="bg-primary h-full justify-center items-center">
+        <Loader />
+      </SafeAreaView>
+    );
+  }
 
   const handleBookmarkToggle = async (postId) => {
     try {
