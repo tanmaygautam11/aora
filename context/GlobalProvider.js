@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getCurrentUser } from "../lib/appwrite";
+import { getCurrentUser, getUserBookmarkedPosts } from "../lib/appwrite";
 
 const GlobalContext = createContext();
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -8,36 +8,43 @@ const GlobalProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    
-    // New state for tracking bookmarked posts
-    const [bookmarkedPosts, setBookmarkedPosts] = useState({});
+    const [bookmarkedPosts, setBookmarkedPosts] = useState({}); // Track bookmarks
 
     useEffect(() => {
-        getCurrentUser()
-            .then(res => {
-                if (res) {
+        const initializeUser = async () => {
+            try {
+                const currentUser = await getCurrentUser();
+                if (currentUser) {
                     setIsLoggedIn(true);
-                    setUser(res);
+                    setUser(currentUser);
+
+                    // Fetch and set initial bookmarked posts
+                    const bookmarks = await getUserBookmarkedPosts(currentUser.$id);
+                    const bookmarksMap = bookmarks.reduce((acc, post) => {
+                        acc[post.$id] = true;
+                        return acc;
+                    }, {});
+                    setBookmarkedPosts(bookmarksMap);
                 } else {
                     setIsLoggedIn(false);
                     setUser(null);
                 }
-            })
-            .catch(error => {
-                console.log(error);
+            } catch (error) {
+                console.error("Error initializing user:", error);
                 setIsLoggedIn(false);
                 setUser(null);
-            })
-            .finally(() => {
+            } finally {
                 setIsLoading(false);
-            });
+            }
+        };
+
+        initializeUser();
     }, []);
 
-    // Function to toggle bookmark status in global state
     const toggleBookmarkInGlobalState = (postId, isBookmarked) => {
         setBookmarkedPosts((prev) => ({
             ...prev,
-            [postId]: isBookmarked
+            [postId]: isBookmarked,
         }));
     };
 
@@ -49,13 +56,13 @@ const GlobalProvider = ({ children }) => {
                 user,
                 setUser,
                 isLoading,
-                bookmarkedPosts, // Expose the bookmarkedPosts state
-                toggleBookmarkInGlobalState // Function to toggle bookmarks
+                bookmarkedPosts,
+                toggleBookmarkInGlobalState,
             }}
         >
             {children}
         </GlobalContext.Provider>
     );
-}
+};
 
 export default GlobalProvider;
